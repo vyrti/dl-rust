@@ -1,0 +1,7 @@
+main
+dl
+build/
+target/
+downloads/
+.DS_Store
+*.gguf
