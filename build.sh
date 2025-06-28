@@ -31,9 +31,9 @@ echo "Checking for necessary cross-compilation toolchains..."
 rustup target list --installed
 
 # Iterate over targets and build
-for ((i=0; i<${#targets[@]}; i+=2)); do
-    target_triple="${targets[i]}"
-    output_name="${targets[i+1]}"
+for target_entry in "${targets[@]}"; do
+    # Split the entry into target_triple and output_name
+    read -r target_triple output_name <<< "$target_entry"
 
     echo "----------------------------------------------------"
     echo "Building for: $target_triple"

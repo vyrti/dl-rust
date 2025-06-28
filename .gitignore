@@ -3,5 +3,6 @@ dl
 build/
 target/
 downloads/
+Cargo.lock
 .DS_Store
 *.gguf
