@@ -1,6 +1,3 @@
-## AI Assistance
-This project was developed with assistance from AI coding tools including Claude Sonnet 4 and Gemini Pro 2.5 
-
 # DL (Rust Edition)
 
 DL is a command-line tool written in Rust for downloading multiple files concurrently from a list of URLs or a Hugging Face repository. It features a dynamic progress bar display for each download, showing speed, percentage, and downloaded/total size. The tool supports advanced Hugging Face repository handling, including interactive selection of specific `.gguf` files or series.
