@@ -3,7 +3,7 @@ name = "dl"
 version = "0.1.5"
 edition = "2021"
 description = "A command-line tool for concurrent downloads from URLs or Hugging Face, with app management and system info utilities."
-license = "MIT"
+license = "Apache-2.0"
 
 [dependencies]
 tokio = { version = "1.45", features = ["macros", "rt-multi-thread", "fs", "io-util"] }

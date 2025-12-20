@@ -91,4 +91,4 @@ This will produce binaries for macOS (Intel/ARM), Windows (x64/ARM), and Linux (
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the Apache 2.0
