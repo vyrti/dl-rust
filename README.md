@@ -1,7 +1,7 @@
 # DL (Rust Edition)
 
 DL is a command-line tool written in Rust for downloading multiple files concurrently from a list of URLs or a Hugging Face repository. It features a dynamic progress bar display for each download, showing speed, percentage, and downloaded/total size. The tool supports advanced Hugging Face repository handling, including interactive selection of specific `.gguf` files or series.
-Auto-update is available with `dl update-app`.
+Auto-update is available with `dl update`.
 
 ![Screenshot of DL tool](image.png)
 
@@ -13,7 +13,6 @@ Auto-update is available with `dl update-app`.
     ```bash
     cargo build --release
     ```
-    The binary will be at `./target/release/dl`. For convenience, you might want to add `./target/release` to your system's PATH or copy the `dl` executable to a directory already in your PATH.
 
 3.  **Download from a URL list:**
     ```bash
@@ -42,7 +41,7 @@ Auto-update is available with `dl update-app`.
 
 8.  **Self-update the tool:**
     ```bash
-    dl update-app
+    dl update
     ```
 
 ### Features
@@ -53,7 +52,7 @@ Auto-update is available with `dl update-app`.
 *   **Model Search:** Search Hugging Face models from the command line.
 *   **Resume Downloads:** Automatically resumes interrupted downloads if the server supports it.
 *   **Hugging Face GGUF Selection:** Use `-s` to interactively choose `.gguf` files or series.
-*   **Dynamic Progress Bars:** A clean and efficient UI powered by `indicatif`, showing consistent progress, speed, and human-readable ETA.
+*   **Dynamic Progress Bars:** A clean and efficient UI powered by `indicatif`. Only active downloads are shown, keeping the display clutter-free even with hundreds of queued files.
 *   **Organized Output:** Downloads go to `downloads/`, with subfolders for Hugging Face repos and models.
 *   **Error Handling:** Clear error messages and robust handling of download issues.
 *   **Debug Logging:** Enable with `--debug` (logs to `log.log`).
@@ -79,15 +78,6 @@ Run `dl --help` for a full list of commands and flags.
 *   `update`: Self-update the tool.
 
 ---
-
-## Build for all platforms
-
-To build the tool for all supported platforms, run the included shell script:
-
-```bash
-./build.sh
-
-This will produce binaries for macOS (Intel/ARM), Windows (x64/ARM), and Linux (x64/ARM) in the build/ directory, provided you have the necessary Rust cross-compilation targets installed.
 
 ## License
 
