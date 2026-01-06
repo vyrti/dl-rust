@@ -33,6 +33,7 @@ struct DownloadTask {
     destination_path: PathBuf,
     progress_bar: ProgressBar,
     overall_progress_bar: ProgressBar,
+    multi_progress: Arc<MultiProgress>,
     client: reqwest::Client,
 }
 
@@ -124,13 +125,6 @@ pub async fn run_downloads(
      .with_key("total_bytes_formatted", |state: &ProgressState, w: &mut dyn FmtWrite| write!(w, "{}", format_bytes(state.len().unwrap_or(0))).unwrap())
      .with_key("eta_formatted", |state: &ProgressState, w: &mut dyn FmtWrite| write!(w, "{}", format_duration_human(state.eta(), true)).unwrap())
      .progress_chars("=> ");
-    
-    // The Fix: New styles for finished states.
-    let finished_style = ProgressStyle::with_template(
-        "{msg:30!} [Done] {bytes_formatted}"
-    ).expect("Invalid finished progress bar template")
-     .with_key("bytes_formatted", |state: &ProgressState, w: &mut dyn FmtWrite| write!(w, "{}", format_bytes(state.pos())).unwrap());
-
     let error_style = ProgressStyle::with_template(
         "{msg:30!} [ERROR: {wide_msg}]"
     ).expect("Invalid error progress bar template");
@@ -142,9 +136,10 @@ pub async fn run_downloads(
         let destination_path = base_dir.join(&actual_filename);
 
         let size = *file_sizes.lock().unwrap().get(&item.url).unwrap_or(&0);
-        let pb = multi_progress.add(ProgressBar::new(size));
-        
-        pb.set_style(download_style.clone()); // Use the common download style
+        // Create progress bar hidden initially - it will be shown when download starts
+        let pb = ProgressBar::new(size);
+        pb.set_draw_target(indicatif::ProgressDrawTarget::hidden());
+        pb.set_style(download_style.clone());
         pb.set_message(truncate_filename(&actual_filename, 30));
 
         tasks.push(DownloadTask {
@@ -152,6 +147,7 @@ pub async fn run_downloads(
             destination_path,
             progress_bar: pb,
             overall_progress_bar: overall_pb.clone(),
+            multi_progress: multi_progress.clone(),
             client: download_client.clone(),
         });
     }
@@ -159,20 +155,19 @@ pub async fn run_downloads(
     // --- Execute downloads ---
     let download_futs = tasks.into_iter().map(|task| {
         let url_for_log = task.item.url.clone();
-        // The Fix: Clone the progress bars here, BEFORE `task` is moved into `download_file`.
+        // Clone progress bar for post-download handling
         let pb_clone_for_post_download = task.progress_bar.clone();
-        let finished_style_clone = finished_style.clone();
         let error_style_clone = error_style.clone();
 
         tokio::spawn(async move {
             if let Err(e) = download_file(task).await {
                 error!("Download failed for {}: {:?}", url_for_log, e);
                 let short_err = shorten_error(&e, 40);
-                pb_clone_for_post_download.set_style(error_style_clone); // Use the cloned bar
+                pb_clone_for_post_download.set_style(error_style_clone);
                 pb_clone_for_post_download.finish_with_message(short_err);
             } else {
-                pb_clone_for_post_download.set_style(finished_style_clone); // Use the cloned bar
-                pb_clone_for_post_download.finish(); // Mark as finished, message already set in download_file
+                // Clear completed downloads from display
+                pb_clone_for_post_download.finish_and_clear();
             }
         })
     });
@@ -190,9 +185,11 @@ pub async fn run_downloads(
 async fn download_file(task: DownloadTask) -> Result<()> {
     let url = &task.item.url;
     let path = &task.destination_path;
-    let pb = &task.progress_bar;
     let overall_pb = &task.overall_progress_bar;
     let client = &task.client;
+    
+    // Add progress bar to display now that this download is starting
+    let pb = task.multi_progress.add(task.progress_bar);
     
     info!("Starting download for URL: {}", url);
     debug!("Destination path: {}", path.display());
