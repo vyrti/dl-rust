@@ -1,6 +1,6 @@
 [package]
 name = "dl"
-version = "0.0.2"
+version = "0.0.1"
 edition = "2021"
 description = "A command-line tool for concurrent downloads from URLs or Hugging Face, with app management and system info utilities."
 license = "Apache-2.0"
