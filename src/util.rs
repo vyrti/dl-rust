@@ -1,7 +1,7 @@
 use anyhow::Result;
 use path_clean::PathClean;
 use std::backtrace::Backtrace;
-use std::panic::PanicInfo;
+use std::panic::PanicHookInfo;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -156,7 +156,7 @@ pub fn generate_actual_filename(url_str: &str, preferred_name: Option<&str>) -> 
 }
 
 /// A panic hook that logs the panic information before the program exits.
-pub fn log_panic(info: &PanicInfo<'_>) {
+pub fn log_panic(info: &PanicHookInfo<'_>) {
     // Ensure the cursor is visible
     let term = console::Term::stdout();
     let _ = term.show_cursor();

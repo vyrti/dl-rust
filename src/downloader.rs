@@ -15,7 +15,7 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc, Mutex,
 };
-use std::time::Duration;
+
 use tokio::io::AsyncWriteExt;
 
 // A dedicated, higher concurrency level for fetching metadata.
